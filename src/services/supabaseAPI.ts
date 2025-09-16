@@ -125,7 +125,7 @@ export class SupabaseHappyPaisaAPI {
     }
     
     const { data, error } = await this.supabase
-      .from('user_profiles')
+      .from('User')
       .insert([profile])
       .select()
       .single()
@@ -144,7 +144,7 @@ export class SupabaseHappyPaisaAPI {
     }
     
     const { data, error } = await this.supabase
-      .from('user_profiles')
+      .from('User')
       .select('*')
       .eq('id', userId)
       .single()
@@ -170,7 +170,7 @@ export class SupabaseHappyPaisaAPI {
     if (!this.supabase) throw new Error('Supabase not configured')
     
     const { data, error } = await this.supabase
-      .from('user_profiles')
+      .from('User')
       .update({
         ...updates,
         updated_at: new Date().toISOString()

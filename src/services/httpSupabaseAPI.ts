@@ -200,7 +200,7 @@ class HttpSupabaseAPI {
     }
     
     // Update user profile - reduce Happy Paisa, increase Happy Coins
-    await this.makeRequest(`/user_profiles?id=eq.${userId}`, {
+    await this.makeRequest(`/User?id=eq.${userId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         balance: profile.balance - happyPaisaAmount,
@@ -249,7 +249,7 @@ class HttpSupabaseAPI {
     });
     
     // Update user profile - reduce Happy Coins, increase staked amount
-    await this.makeRequest(`/user_profiles?id=eq.${userId}`, {
+    await this.makeRequest(`/User?id=eq.${userId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         happy_coins: (profile.happy_coins || 0) - happyCoins,
@@ -309,7 +309,7 @@ class HttpSupabaseAPI {
     
     console.log('🌐 HttpSupabaseAPI: Clean updates:', cleanUpdates);
     
-    const data = await this.makeRequest(`/user_profiles?id=eq.${userId}`, {
+    const data = await this.makeRequest(`/User?id=eq.${userId}`, {
       method: 'PATCH',
       body: JSON.stringify(cleanUpdates)
     });
