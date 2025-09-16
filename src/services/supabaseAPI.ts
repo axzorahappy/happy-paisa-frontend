@@ -96,6 +96,17 @@ export class SupabaseHappyPaisaAPI {
     if (error) throw error
   }
 
+  async resetPassword(email: string) {
+    if (!this.supabase) throw new Error('Supabase not configured')
+    
+    const { data, error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    })
+    
+    if (error) throw error
+    return data
+  }
+
   async getCurrentUser(): Promise<User | null> {
     if (!this.supabase) return null
     
@@ -360,6 +371,7 @@ export const useSupabaseAuth = () => {
     signUp: supabaseAPI.signUp.bind(supabaseAPI),
     signIn: supabaseAPI.signIn.bind(supabaseAPI),
     signOut: supabaseAPI.signOut.bind(supabaseAPI),
+    resetPassword: supabaseAPI.resetPassword.bind(supabaseAPI),
     getCurrentUser: supabaseAPI.getCurrentUser.bind(supabaseAPI),
     getSession: supabaseAPI.getSession.bind(supabaseAPI),
     onAuthStateChange: supabaseAPI.onAuthStateChange.bind(supabaseAPI)

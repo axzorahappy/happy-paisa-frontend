@@ -16,6 +16,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, username?: string) => Promise<any>
   signIn: (email: string, password: string) => Promise<any>
   signOut: () => Promise<void>
+  resetPassword: (email: string) => Promise<any>
   
   // Profile methods
   updateProfile: (updates: Partial<UserProfile>) => Promise<UserProfile>
@@ -176,6 +177,11 @@ console.log('Auth initialization complete')
     await loadUserProfile(user.id)
   }
 
+  const resetPassword = async (email: string) => {
+    const result = await supabaseAPI.resetPassword(email)
+    return result
+  }
+
   const isAuthenticated = !!user && !!session
 
   const value: AuthContextType = {
@@ -187,6 +193,7 @@ console.log('Auth initialization complete')
     signUp,
     signIn,
     signOut,
+    resetPassword,
     updateProfile,
     refreshProfile
   }

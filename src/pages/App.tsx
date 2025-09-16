@@ -7,6 +7,8 @@ import WalletPage from './Wallet'
 import AIAssistant from './AIAssistant'
 import ProfilePage from './Profile'
 import SigninPage from './SigninPage'
+import ForgotPasswordPage from './ForgotPasswordPage'
+import ResetPasswordPage from './ResetPasswordPage'
 import AuthCallback from './AuthCallback'
 // import LeaderboardDemo from '../components/LeaderboardDemo'
 import TestPage from '../components/TestPage'
@@ -25,6 +27,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/signin" element={<SigninPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<GamesDashboard />} />
