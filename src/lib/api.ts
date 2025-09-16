@@ -1,7 +1,7 @@
 import { getSupabase } from './supabase';
 
 export function getBackendUrl() {
-  return import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+  return import.meta.env.VITE_BACKEND_URL || 'https://vnbnzyszoibyaruujnok.supabase.co/functions/v1/happy-paisa-api';
 }
 
 async function attachAuth(headers: Headers, devUserId?: string) {

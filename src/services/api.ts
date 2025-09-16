@@ -1,5 +1,5 @@
 // Real API Service for Happy Paisa Backend
-const API_BASE_URL = 'http://localhost:3001/api'
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://vnbnzyszoibyaruujnok.supabase.co/functions/v1/happy-paisa-api/api'
 
 // Types
 export interface User {

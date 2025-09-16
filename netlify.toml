@@ -10,3 +10,7 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  VITE_APP_URL = "https://happypaisa.com"
+  VITE_BACKEND_URL = "https://vnbnzyszoibyaruujnok.supabase.co/functions/v1/happy-paisa-api"
+  VITE_SUPABASE_URL = "https://vnbnzyszoibyaruujnok.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuYm56eXN6b2lieWFydXVqbm9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NzMxODEsImV4cCI6MjA3MzM0OTE4MX0.yYaCKSS6dQgAEw7U-Mgr3_P6yxJi0V-zHIPSa-lf3jE"
