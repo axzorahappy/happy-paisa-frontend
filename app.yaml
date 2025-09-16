@@ -1,0 +1,36 @@
+runtime: nodejs18
+
+# Static file serving configuration for React SPA
+handlers:
+  # Serve static assets with long cache
+  - url: /assets
+    static_dir: dist/assets
+    secure: always
+    http_headers:
+      Cache-Control: "public, max-age=31536000, immutable"
+
+  # Serve other static files
+  - url: /(.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json))$
+    static_files: dist/\1
+    upload: dist/(.*)
+    secure: always
+    http_headers:
+      Cache-Control: "public, max-age=3600"
+
+  # Serve index.html for all other routes (SPA routing)
+  - url: /.*
+    static_files: dist/index.html
+    upload: dist/index.html
+    secure: always
+    http_headers:
+      Cache-Control: "no-cache, no-store, must-revalidate"
+
+# Environment variables
+env_variables:
+  NODE_ENV: production
+  
+# Instance configuration
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.8

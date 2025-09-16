@@ -1,0 +1,32 @@
+# Ignore node modules
+node_modules/
+
+# Ignore source files (we only need dist/)
+src/
+public/
+*.ts
+*.tsx
+*.md
+*.json
+package-lock.json
+
+# Ignore development files
+.git/
+.gitignore
+.env*
+.vscode/
+*.log
+vite.config.ts
+tsconfig.json
+tailwind.config.js
+postcss.config.js
+
+# Ignore testing files
+__tests__/
+*.test.*
+*.spec.*
+
+# Keep only production build
+!dist/
+!app.yaml
+!package.json
