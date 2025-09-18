@@ -20,7 +20,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { httpSupabaseAPI } from '../services/httpSupabaseAPI'
+import { httpSupabaseAPI, WalletTransaction, P2POffer, Booking } from '../services/httpSupabaseAPI';
 
 interface SocialLinks {
   facebook?: string
@@ -64,7 +64,7 @@ export default function ProfilePage() {
   })
 
   const [editForm, setEditForm] = useState<UserProfile>(profile)
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [offers, setOffers] = useState<P2POffer[]>([]);
 
   // Happy emoji avatars collection
   const emojiAvatars = [
@@ -83,7 +83,13 @@ export default function ProfilePage() {
     try {
       setLoading(true)
       
-      if (isAuthenticated && authProfile) {
+      if (isAuthenticated && user) {
+        httpSupabaseAPI.getWalletTransactions(user.id).then(setTransactions);
+        httpSupabaseAPI.getP2POffers().then(setOffers);
+        httpSupabaseAPI.getBookings(user.id).then(setBookings);
+        httpSupabaseAPI.getP2POffers().then(setOffers);
+        httpSupabaseAPI.getBookings(user.id).then(setBookings);
+        // Use real Supabase profile data
         // Use real Supabase profile data
         const userProfile: UserProfile = {
           id: authProfile.id,

@@ -1,57 +1,95 @@
-import { DollarSign, Percent, ArrowDown, ArrowUp, Phone, Receipt, Utensils, Plane } from 'lucide-react'
+import React, { useEffect, useState, lazy, Suspense } from 'react';
+import { ThemeSwitcher } from '../components/ThemeSwitcher';
+import RGL, { WidthProvider } from 'react-grid-layout';
+import { getWidgets, getWidget } from '../lib/widgetRegistry';
+import '../lib/widget-registrations';
+import { WidgetWrapper } from '../components/WidgetWrapper';
+import { dataStore } from '../lib/dataStore';
+import { dashboardConfig as defaultConfig } from '../lib/dashboardConfig';
+import { AddWidgetDrawer } from '../components/AddWidgetDrawer';
 
-function StatCard({ title, amount, change, icon: Icon, changeType }: { title: string; amount: string; change?: string; icon: any; changeType?: 'increase' | 'decrease' }) {
-  return (
-    <div className="bg-[#2c2c2c] p-6 rounded-lg">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="text-gray-400 text-sm">{title}</p>
-          <p className="text-3xl font-bold">{amount}</p>
-        </div>
-        <div className={`p-3 rounded-lg bg-gray-700`}>
-          <Icon className="text-white" />
-        </div>
-      </div>
-      {change && (
-        <div className={`flex items-center text-sm mt-4 ${changeType === 'increase' ? 'text-green-400' : 'text-red-400'}`}>
-          {changeType === 'increase' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
-          <span>{change}</span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function QuickAction({ icon: Icon, label }: { icon: any; label: string }) {
-  return (
-    <div className="bg-[#2c2c2c] p-6 rounded-lg text-center hover:bg-gray-700 cursor-pointer">
-      <Icon className="mx-auto mb-4" size={32} />
-      <p>{label}</p>
-    </div>
-  )
-}
+const ReactGridLayout = WidthProvider(RGL);
 
 export default function Dashboard() {
-  return (
-    <div>
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard title="Total Balance" amount="₹12,450.75" change="+2.5% this month" icon={DollarSign} changeType="increase" />
-        <StatCard title="Happy Paisa" amount="2,450 HP" change="From gaming" icon={Percent} />
-        <StatCard title="Cashback" amount="₹180.50" change="This week" icon={DollarSign} />
-        <StatCard title="This Month" amount="₹8,240" change="Spent" icon={ArrowDown} changeType="decrease" />
-      </div>
+  const [isEditable, setIsEditable] = useState(false);
+  const [isAddWidgetDrawerOpen, setIsAddWidgetDrawerOpen] = useState(false);
+  const [dashboardConfig, setDashboardConfig] = useState(defaultConfig);
 
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <QuickAction icon={Phone} label="Recharge" />
-          <QuickAction icon={Receipt} label="Pay Bills" />
-          <QuickAction icon={Utensils} label="Food" />
-          <QuickAction icon={Plane} label="Travel" />
-        </div>
+  useEffect(() => {
+    dataStore.fetchData();
+    const savedConfig = localStorage.getItem('dashboardConfig');
+    if (savedConfig) {
+      setDashboardConfig(JSON.parse(savedConfig));
+    }
+  }, []);
+
+  const widgets = dashboardConfig.widgets.map(widget => {
+      const registeredWidget = getWidgets().find(w => w.type === widget.type);
+      if (registeredWidget) {
+          return { ...widget, component: registeredWidget.component };
+      }
+      return widget;
+  });
+  const layout = widgets.map(w => w.layout);
+
+  const handleAddWidget = (widgetType: string) => {
+    const widget = getWidget(widgetType);
+    if (widget) {
+        const newWidget = { ...widget, layout: { ...widget.layout, i: new Date().getTime().toString() } };
+        setDashboardConfig(prevConfig => ({
+            ...prevConfig,
+            widgets: [...prevConfig.widgets, newWidget],
+        }));
+    }
+  }
+
+  const handleLayoutChange = (newLayout: RGL.Layout[]) => {
+    setDashboardConfig(prevConfig => ({
+        ...prevConfig,
+        layouts: { lg: newLayout },
+    }));
+  }
+
+  const handleSave = () => {
+    localStorage.setItem('dashboardConfig', JSON.stringify(dashboardConfig));
+    setIsEditable(false);
+  }
+
+  return (
+    <div className="bg-background text-text p-4" role="main">
+      <div className="flex justify-end mb-4">
+        {isEditable && (
+            <button onClick={() => setIsAddWidgetDrawerOpen(true)} className="p-2 bg-surface rounded mr-2" aria-label="Add widget">
+                Add Widget
+            </button>
+        )}
+        <button onClick={isEditable ? handleSave : () => setIsEditable(true)} className="p-2 bg-surface rounded mr-2" aria-label={isEditable ? 'Save layout' : 'Edit layout'}>
+            {isEditable ? 'Save' : 'Edit'}
+        </button>
+        <ThemeSwitcher />
       </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ReactGridLayout 
+          layouts={dashboardConfig.layouts}
+          onLayoutChange={handleLayoutChange}
+          cols={dashboardConfig.grid.cols} 
+          rowHeight={dashboardConfig.grid.rowHeight}
+          isDraggable={isEditable}
+          isResizable={isEditable}
+          aria-label="Dashboard grid"
+        >
+          {widgets.map(widget => (
+            <div key={widget.layout.i} aria-label={widget.title}>
+              <WidgetWrapper widget={widget} />
+            </div>
+          ))}
+        </ReactGridLayout>
+      </Suspense>
+      <AddWidgetDrawer 
+        isOpen={isAddWidgetDrawerOpen} 
+        onClose={() => setIsAddWidgetDrawerOpen(false)} 
+        onAddWidget={handleAddWidget} 
+      />
     </div>
   )
 }

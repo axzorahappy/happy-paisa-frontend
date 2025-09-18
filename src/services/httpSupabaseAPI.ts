@@ -51,6 +51,26 @@ export interface WalletLedgerEntry {
   created_at: string;
 }
 
+export interface Bus {
+  id: string;
+  from_city: string;
+  to_city: string;
+  date: string;
+  price: number;
+  bus_operator: string;
+  created_at: string;
+}
+
+export interface P2POffer {
+  id: string;
+  user_id: string;
+  type: 'buy' | 'sell';
+  amount: number;
+  price: number;
+  status: 'open' | 'closed' | 'cancelled';
+  created_at: string;
+}
+
 export interface StakingPosition {
   id: string;
   user_id: string;
@@ -62,6 +82,28 @@ export interface StakingPosition {
   matures_at: string;
   claimed_at?: string;
   reward_amount: number;
+}
+
+export interface Booking {
+  id: string;
+  user_id: string;
+  type: 'flight' | 'bus';
+  item_id: string;
+  passenger_name: string;
+  passenger_email: string;
+  passenger_phone: string;
+  created_at: string;
+}
+
+export interface Flight {
+  id: string;
+  from_city: string;
+  to_city: string;
+  departure_date: string;
+  return_date?: string;
+  price: number;
+  airline: string;
+  created_at: string;
 }
 
 export interface WalletBalances {
@@ -277,6 +319,100 @@ class HttpSupabaseAPI {
     console.log('🌍 HttpSupabaseAPI: Getting staking positions for:', userId);
     
     const data = await this.makeRequest(`/staking_positions?user_id=eq.${userId}&order=staked_at.desc`, {
+      method: 'GET'
+    });
+    
+    return data || [];
+  }
+
+  async getP2POffers(): Promise<P2POffer[]> {
+    console.log('🌍 HttpSupabaseAPI: Getting P2P offers');
+    
+    const data = await this.makeRequest('/p2p_offers?status=eq.open&order=created_at.desc', {
+      method: 'GET'
+    });
+    
+    return data || [];
+  }
+
+  async createP2POffer(userId: string, type: 'buy' | 'sell', amount: number, price: number): Promise<P2POffer> {
+    console.log('🌍 HttpSupabaseAPI: Creating P2P offer for:', userId, type, amount, price);
+    
+    const data = await this.makeRequest('/p2p_offers', {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: userId,
+        type: type,
+        amount: amount,
+        price: price,
+      })
+    });
+    
+    return data[0];
+  }
+
+  async acceptP2POffer(offerId: string, userId: string): Promise<any> {
+    console.log('🌍 HttpSupabaseAPI: Accepting P2P offer for:', offerId, userId);
+    
+    // This is a placeholder for a more complex transaction
+    // In a real application, you would need to handle the transfer of coins and money
+    const data = await this.makeRequest(`/p2p_offers?id=eq.${offerId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: 'closed',
+      })
+    });
+    
+    return data[0];
+  }
+
+  async searchFlights(from: string, to: string, departureDate: string, returnDate?: string): Promise<Flight[]> {
+    console.log('🌍 HttpSupabaseAPI: Searching for flights from', from, 'to', to, 'on', departureDate);
+    
+    let query = `/flights?from_city=eq.${from}&to_city=eq.${to}&departure_date=eq.${departureDate}`;
+    if (returnDate) {
+      query += `&return_date=eq.${returnDate}`;
+    }
+    
+    const data = await this.makeRequest(query, {
+      method: 'GET'
+    });
+    
+    return data || [];
+  }
+
+  async searchBuses(from: string, to: string, date: string): Promise<Bus[]> {
+    console.log('🌍 HttpSupabaseAPI: Searching for buses from', from, 'to', to, 'on', date);
+    
+    const data = await this.makeRequest(`/buses?from_city=eq.${from}&to_city=eq.${to}&date=eq.${date}`, {
+      method: 'GET'
+    });
+    
+    return data || [];
+  }
+
+  async createBooking(userId: string, type: 'flight' | 'bus', itemId: string, passengerName: string, passengerEmail: string, passengerPhone: string): Promise<Booking> {
+    console.log('🌍 HttpSupabaseAPI: Creating booking for:', userId, type, itemId);
+    
+    const data = await this.makeRequest('/bookings', {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: userId,
+        type: type,
+        item_id: itemId,
+        passenger_name: passengerName,
+        passenger_email: passengerEmail,
+        passenger_phone: passengerPhone,
+      })
+    });
+    
+    return data[0];
+  }
+
+  async getBookings(userId: string): Promise<Booking[]> {
+    console.log('🌍 HttpSupabaseAPI: Getting bookings for:', userId);
+    
+    const data = await this.makeRequest(`/bookings?user_id=eq.${userId}&order=created_at.desc`, {
       method: 'GET'
     });
     
