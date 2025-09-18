@@ -14,17 +14,6 @@
     <script type="module" src="/src/main.tsx"></script>
     
     <!-- Netlify Identity Auto-Init -->
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', user => {
-          if (!user) {
-            window.netlifyIdentity.on('login', () => {
-              document.location.href = '/';
-            });
-          }
-        });
-      }
-    </script>
   </body>
 </html>
 

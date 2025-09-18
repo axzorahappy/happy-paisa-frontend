@@ -1,7 +1,18 @@
-import { Link } from 'react-router-dom'
 import { Coins, Gamepad2, Sparkles, Shield, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import FloatingMrHappy from '../components/FloatingMrHappy'
+
+declare global {
+  interface Window {
+    netlifyIdentity: any;
+  }
+}
+
+function openNetlifyModal() {
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.open();
+  }
+}
 
 function Feature({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
   return (
@@ -51,12 +62,12 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 0.1 }}
               className="mt-8 flex flex-wrap justify-center items-center gap-3"
             >
-              <Link to="/signin" className="rounded-lg px-8 py-4 text-base font-medium text-white bg-gradient-to-r from-brand-600 to-brand-400 shadow-sm hover:opacity-95 inline-flex items-center gap-2">
+              <button onClick={openNetlifyModal} className="rounded-lg px-8 py-4 text-base font-medium text-white bg-gradient-to-r from-brand-600 to-brand-400 shadow-sm hover:opacity-95 inline-flex items-center gap-2">
                 Get Started <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link to="/signin" className="rounded-lg border border-white/15 bg-white/5 px-8 py-4 text-base text-white/90 hover:bg-white/10 inline-flex items-center gap-2">
+              </button>
+              <button onClick={openNetlifyModal} className="rounded-lg border border-white/15 bg-white/5 px-8 py-4 text-base text-white/90 hover:bg-white/10 inline-flex items-center gap-2">
                 Sign In <Gamepad2 className="w-5 h-5" />
-              </Link>
+              </button>
             </motion.div>
           </div>
         </div>
