@@ -14,6 +14,16 @@
     <script type="module" src="/src/main.tsx"></script>
     
     <!-- Netlify Identity Auto-Init -->
+    <script>
+      // Handle email confirmation tokens from custom email template
+      if (window.location.hash && window.netlifyIdentity) {
+        const hash = window.location.hash;
+        if (hash.includes('confirmation_token=')) {
+          const token = hash.split('confirmation_token=')[1].split('&')[0];
+          window.netlifyIdentity.confirm(token, true);
+        }
+      }
+    </script>
   </body>
 </html>
 
