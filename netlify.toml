@@ -8,7 +8,7 @@
   status = 200
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NPM_VERSION = "9"
   VITE_APP_URL = "https://happypaisa.com"
   VITE_BACKEND_URL = "https://vnbnzyszoibyaruujnok.supabase.co/functions/v1/happy-paisa-api"
