@@ -43,9 +43,11 @@ export default function DashboardLayout() {
   // Redirect to signin if not authenticated and not loading
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      navigate('/signin')
+      navigate('/');
+    } else if (!loading && isAuthenticated && location.pathname === '/') {
+      navigate('/dashboard');
     }
-  }, [loading, isAuthenticated, navigate])
+  }, [loading, isAuthenticated, navigate, location.pathname]);
   
   const handleSignOut = async () => {
     console.log('🚶 DashboardLayout: Sign out button clicked')
