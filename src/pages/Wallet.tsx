@@ -1,8 +1,38 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { CreditCard, Coins, PiggyBank, ArrowUpRight, ArrowDownRight, Gift, RotateCcw, ShoppingCart, TrendingUp, Wallet } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { httpSupabaseAPI, WalletTransaction, WalletBalances } from '../services/httpSupabaseAPI';
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { CreditCard, Coins, PiggyBank, ArrowUpRight, ArrowDownRight, Gift, RotateCcw, ShoppingCart, TrendingUp, Wallet as WalletIcon } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+import { httpSupabaseAPI, WalletTransaction, WalletBalances } from '../services/httpSupabaseAPI'
+
+function BalanceCard({ icon: Icon, title, amount, subtext, colorClass }: { icon: any; title: string; amount: number; subtext: string; colorClass: string }) {
+  return (
+    <div className={`card flex-1 ${colorClass}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted">{title}</p>
+          <h2 className="text-3xl font-bold">{amount.toLocaleString()}</h2>
+          <p className="text-sm font-semibold text-muted">{subtext}</p>
+        </div>
+        <Icon size={48} className="opacity-20" />
+      </div>
+    </div>
+  )
+}
+
+function ActionCard({ icon: Icon, title, description, children }: { icon: any; title: string; description: string; children: React.ReactNode }) {
+  return (
+    <div className="card">
+      <div className="flex items-center gap-4 mb-6">
+        <Icon size={32} className="text-brand" />
+        <div>
+          <h3 className="text-xl font-bold">{title}</h3>
+          <p className="text-muted">{description}</p>
+        </div>
+      </div>
+      {children}
+    </div>
+  )
+}
 
 interface LocalWalletBalances {
   happyCoins: number;    // HC (purchased with real money)
@@ -288,491 +318,138 @@ export default function WalletPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-4xl mx-auto p-6 space-y-6"
     >
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">💰 My Wallet</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold flex items-center gap-3"><WalletIcon />My Wallet</h1>
         <motion.button
           onClick={loadWalletData}
-          className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+          className="btn btn-secondary flex items-center gap-2"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <RotateCcw className="w-5 h-5 text-white" />
+          <RotateCcw size={16} />
+          Refresh
         </motion.button>
       </div>
 
       {/* Balance Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-200 text-sm">Happy Coins (HC)</p>
-              <h2 className="text-3xl font-bold text-white">{balances.happyCoins?.toLocaleString() || '0'}</h2>
-              <p className="text-blue-400 text-lg font-semibold">Purchased</p>
-            </div>
-            <Wallet className="w-12 h-12 text-blue-400" />
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-200 text-sm">Happy Paisa</p>
-              <h2 className="text-3xl font-bold text-white">{balances.happyPaisa?.toLocaleString() || '0'}</h2>
-              <p className="text-green-400 text-lg font-semibold">From Games</p>
-            </div>
-            <Coins className="w-12 h-12 text-green-400" />
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-200 text-sm">Staked Amount</p>
-              <h2 className="text-3xl font-bold text-white">{balances.stakedAmount?.toLocaleString() || '0'}</h2>
-              <p className="text-purple-400 text-lg font-semibold">Locked</p>
-            </div>
-            <PiggyBank className="w-12 h-12 text-purple-400" />
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 border border-yellow-500/30 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-yellow-200 text-sm">Total Earned</p>
-              <h2 className="text-3xl font-bold text-white">{balances.totalEarned?.toLocaleString() || '0'}</h2>
-              <p className="text-yellow-400 text-lg font-semibold">Lifetime</p>
-            </div>
-            <TrendingUp className="w-12 h-12 text-yellow-400" />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <BalanceCard icon={ShoppingCart} title="Happy Coins (HC)" amount={balances.happyCoins} subtext="Purchased" colorClass="" />
+        <BalanceCard icon={Coins} title="Happy Paisa" amount={balances.happyPaisa} subtext="From Games" colorClass="" />
+        <BalanceCard icon={PiggyBank} title="Staked Amount" amount={balances.stakedAmount} subtext="Locked" colorClass="" />
+        <BalanceCard icon={TrendingUp} title="Total Earned" amount={balances.totalEarned} subtext="Lifetime" colorClass="" />
       </div>
 
-      {/* Buy Coins Section - Always Visible */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <ShoppingCart className="w-8 h-8 text-blue-400" />
-            <div>
-              <h3 className="text-2xl font-bold text-white">💳 Buy Happy Coins</h3>
-              <p className="text-white/70">Purchase HC with real money via Stripe</p>
-            </div>
-          </div>
-          
-          {/* Currency Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-white/70 text-sm">Currency:</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Buy Coins and Staking Section */}
+        <ActionCard icon={ShoppingCart} title="Buy Happy Coins" description="Purchase HC with real money via Stripe">
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-sm text-muted">Currency:</label>
             <select
               value={selectedCurrency}
               onChange={(e) => setSelectedCurrency(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="input text-sm"
             >
-              <option value="USD" className="bg-gray-800">🇺🇸 USD</option>
-              <option value="EUR" className="bg-gray-800">🇪🇺 EUR</option>
-              <option value="INR" className="bg-gray-800">🇮🇳 INR</option>
+              <option value="USD">🇺🇸 USD</option>
+              <option value="EUR">🇪🇺 EUR</option>
+              <option value="INR">🇮🇳 INR</option>
             </select>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { hc: 10, priceUSD: 9.99, popular: false, label: 'Basic' },
-            { hc: 25, priceUSD: 19.99, popular: true, label: 'Popular' },
-            { hc: 50, priceUSD: 34.99, popular: false, label: 'Premium' },
-          ].map((pkg, i) => {
-            const convertedPrice = convertPrice(pkg.priceUSD, selectedCurrency);
-            const formattedPrice = formatPrice(convertedPrice, selectedCurrency);
-            const pricePerHC = convertedPrice / pkg.hc;
-            
-            return (
+          <div className="grid grid-cols-1 gap-4">
+            {[
+              { hc: 10, priceUSD: 9.99, label: 'Basic' },
+              { hc: 25, priceUSD: 19.99, label: 'Popular' },
+              { hc: 50, priceUSD: 34.99, label: 'Premium' },
+            ].map((pkg, i) => {
+              const convertedPrice = convertPrice(pkg.priceUSD, selectedCurrency);
+              const formattedPrice = formatPrice(convertedPrice, selectedCurrency);
+              return (
+                <motion.div
+                  key={i}
+                  className="card flex items-center justify-between cursor-pointer"
+                  onClick={() => handleBuyCoins(pkg.hc, pkg.priceUSD, pkg.label)}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div>
+                    <div className="font-bold">{pkg.hc} HC</div>
+                    <div className="text-sm text-muted">{pkg.label}</div>
+                  </div>
+                  <div className="font-bold text-lg text-brand">{formattedPrice}</div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </ActionCard>
+
+        <ActionCard icon={PiggyBank} title="Stake Happy Coins" description="Earn rewards by staking your HC">
+          <div className="grid grid-cols-1 gap-4">
+            {[
+              { days: 7, apy: 5, minStake: 10, label: 'Short Term' },
+              { days: 30, apy: 8, minStake: 25, label: 'Medium Term' },
+              { days: 90, apy: 12, minStake: 50, label: 'Long Term' },
+            ].map((option, i) => (
               <motion.div
                 key={i}
-                className={`relative border rounded-lg p-6 text-center cursor-pointer hover:bg-white/5 transition-colors ${
-                  pkg.popular 
-                    ? 'border-purple-400 bg-purple-500/20' 
-                    : 'border-white/20 bg-white/5'
-                }`}
-                onClick={() => handleBuyCoins(pkg.hc, pkg.priceUSD, pkg.label)}
+                className="card flex items-center justify-between cursor-pointer"
+                onClick={() => handleStake(option.minStake, option.days, option.apy, option.label)}
                 whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
-                {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                    {pkg.label.toUpperCase()}
-                  </div>
-                )}
-                <div className="text-3xl font-bold text-white mb-2">{pkg.hc} HC</div>
-                <div className="text-2xl text-green-400 font-bold mb-1">{formattedPrice}</div>
-                <div className="text-sm text-white/60">{formatPrice(pricePerHC, selectedCurrency)}/HC</div>
-                <div className="mt-4">
-                  <motion.button
-                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 shadow-lg ${
-                      pkg.popular
-                        ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white shadow-purple-500/25'
-                        : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-blue-500/25'
-                    } hover:shadow-xl transform hover:-translate-y-0.5`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    title={`Click to purchase ${pkg.hc} Happy Coins for ${formattedPrice}`}
-                  >
-                    🛍️ Buy {pkg.label}
-                  </motion.button>
+                <div>
+                  <div className="font-bold">{option.days} Days</div>
+                  <div className="text-sm text-muted">Min. {option.minStake} HC</div>
                 </div>
+                <div className="font-bold text-lg text-brand">{option.apy}% APY</div>
               </motion.div>
-            );
-          })}
-        </div>
-        
-        <div className="mt-6 p-4 bg-white/5 rounded-lg">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-white/70">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-green-400" />
-              <span>Secure Stripe Payment</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Coins className="w-4 h-4 text-blue-400" />
-              <span>Instant HC Credit</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Gift className="w-4 h-4 text-purple-400" />
-              <span>No Hidden Fees</span>
-            </div>
+            ))}
           </div>
-        </div>
-      </div>
-      
-      {/* Staking Section - Always Visible */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <PiggyBank className="w-8 h-8 text-purple-400" />
-          <div>
-            <h3 className="text-2xl font-bold text-white">🏦 Stake Happy Coins</h3>
-            <p className="text-white/70">Stake your Happy Coins to earn rewards over time</p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { days: 7, apy: 5, minStake: 10, label: 'Short Term' },
-            { days: 30, apy: 8, minStake: 25, label: 'Medium Term', popular: true },
-            { days: 90, apy: 12, minStake: 50, label: 'Long Term' },
-          ].map((option, i) => (
-            <motion.div
-              key={i}
-              className={`relative border rounded-lg p-6 text-center cursor-pointer hover:bg-white/10 transition-colors ${
-                option.popular
-                  ? 'border-purple-400 bg-purple-500/20'
-                  : 'border-white/20 bg-white/5'
-              }`}
-              onClick={() => handleStake(option.minStake, option.days, option.apy, option.label)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {option.popular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                  BEST VALUE
-                </div>
-              )}
-              <div className="text-3xl font-bold text-white mb-2">{option.days} Days</div>
-              <div className="text-2xl text-green-400 font-bold mb-1">{option.apy}% APY</div>
-              <div className="text-sm text-white/60 mb-4">Min: {option.minStake} HC</div>
-              <motion.button
-                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 shadow-lg ${
-                  option.popular
-                    ? 'bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white shadow-purple-500/25'
-                    : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-green-500/25'
-                } hover:shadow-xl transform hover:-translate-y-0.5`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                title={`Stake ${option.minStake} HC for ${option.days} days at ${option.apy}% APY`}
-              >
-                🏦 Stake {option.label}
-              </motion.button>
-              <div className="mt-2 text-xs text-white/50">Lock period: {option.days} days</div>
-            </motion.div>
-          ))}
-        </div>
-        
-        <div className="mt-6 p-4 bg-white/5 rounded-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-white/70 text-sm">
-                <strong className="text-white">Current Staked:</strong> {balances.stakedAmount} HC
-              </p>
-              <p className="text-white/70 text-sm mt-1">
-                <strong className="text-white">Available to Stake:</strong> {balances.happyCoins} HC
-              </p>
-            </div>
-            <div className="text-sm text-white/60">
-              <p><strong className="text-yellow-400">⚠️ Important:</strong></p>
-              <p>Staked coins are locked for the selected period. Early withdrawal may incur penalties.</p>
-            </div>
-          </div>
-        </div>
+        </ActionCard>
       </div>
 
       {/* Convert Paisa to HC Section */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-4">🔄 Convert Happy Paisa to Happy Coins</h3>
-        <p className="text-white/70 mb-6">Convert your earned Happy Paisa to Happy Coins! (Rate: 1000 Happy Paisa = 1 HC)</p>
-
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1">
-            <input
-              type="number"
-              value={convertAmount}
-              onChange={(e) => setConvertAmount(e.target.value)}
-              placeholder="Amount to convert (e.g. 1000)"
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              min="1000"
-              max={balances.happyPaisa}
-            />
-          </div>
-          <div className="text-white/70 text-sm">
-            ≈ {convertAmount ? ((parseInt(convertAmount) || 0) * conversionRate).toFixed(3) : '0.000'} HC
-          </div>
+      <ActionCard icon={RotateCcw} title="Convert Happy Paisa" description="Convert your earned HP to HC (1000 HP = 1 HC)">
+        <div className="flex items-center gap-4">
+          <input
+            type="number"
+            value={convertAmount}
+            onChange={(e) => setConvertAmount(e.target.value)}
+            placeholder="Amount to convert (e.g. 1000)"
+            className="input flex-1"
+            min="1000"
+            max={balances.happyPaisa}
+          />
+          <button
+            onClick={handleConvertPaisaToCoins}
+            disabled={loading || !convertAmount || parseInt(convertAmount) < 1000}
+            className="btn btn-primary"
+          >
+            {loading ? 'Converting...' : 'Convert'}
+          </button>
         </div>
-
-        <motion.button
-          onClick={handleConvertPaisaToCoins}
-          disabled={loading || !convertAmount || parseInt(convertAmount) < 1000}
-          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transform hover:-translate-y-0.5 disabled:hover:transform-none"
-          whileHover={!loading && convertAmount && parseInt(convertAmount) >= 1000 ? { scale: 1.02 } : {}}
-          whileTap={!loading && convertAmount && parseInt(convertAmount) >= 1000 ? { scale: 0.98 } : {}}
-          title={convertAmount && parseInt(convertAmount) >= 1000 ? `Convert ${convertAmount} Happy Paisa to ${((parseInt(convertAmount) || 0) * conversionRate).toFixed(3)} HC` : 'Enter at least 1000 Happy Paisa to convert'}
-        >
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin mr-3" />
-              Converting...
-            </div>
-          ) : (
-            <span className="inline-flex items-center justify-center gap-3">
-              <RotateCcw className="w-6 h-6" />
-              <span className="text-lg">🔄 Convert to HC</span>
-              {convertAmount && parseInt(convertAmount) >= 1000 && (
-                <span className="bg-white/20 px-3 py-1 rounded-full text-sm">
-                  +{((parseInt(convertAmount) || 0) * conversionRate).toFixed(3)} HC
-                </span>
-              )}
-            </span>
-          )}
-        </motion.button>
-        
-        <div className="mt-4 text-xs text-white/50 text-center">
-          Minimum conversion: 1000 Happy Paisa = 1 HC • Instant conversion
-        </div>
-      </div>
+      </ActionCard>
 
       {/* Transaction History */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-4">📊 Transaction History</h3>
-        <p className="text-white/70 mb-6">Your recent Happy Paisa activity</p>
-        
+      <ActionCard icon={TrendingUp} title="Transaction History" description="Your recent wallet activity">
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {transactions.length > 0 ? (
             transactions.map((transaction) => (
-              <motion.div
-                key={transaction.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
-              >
+              <div key={transaction.id} className="card flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   {getTransactionIcon(transaction.type)}
                   <div>
-                  <p className="font-medium text-white">{transaction.description}</p>
-                    <div className="flex items-center space-x-2 text-sm text-white/60">
-                      <span>{new Date(transaction.created_at).toLocaleDateString()}</span>
-                      <span>•</span>
-                      <span>{new Date(transaction.created_at).toLocaleTimeString()}</span>
-                      {transaction.game_type && (
-                        <>
-                          <span>•</span>
-                          <span className="capitalize">{transaction.game_type}</span>
-                        </>
-                      )}
-                    </div>
+                    <p className="font-medium">{transaction.description}</p>
+                    <p className="text-sm text-muted">{new Date(transaction.created_at).toLocaleString()}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className={`font-bold text-lg ${
-                    transaction.type === 'earned' || transaction.type === 'bonus' || transaction.type === 'refund'
-                      ? 'text-green-400'
-                      : 'text-red-400'
-                  }`}>
-                    {transaction.type === 'spent' ? '-' : '+'}{transaction.amount} Happy Paisa
-                  </p>
-                </div>
-              </motion.div>
-            ))
-          ) : (
-            <div className="text-center py-8">
-              <Coins className="w-12 h-12 text-white/30 mx-auto mb-4" />
-              <p className="text-white/70">No transactions yet</p>
-              <p className="text-white/50 text-sm">Play games to start earning Happy Paisa!</p>
-            </div>
-          )}
-        </div>
-        
-        {transactions.length > 5 && (
-          <div className="mt-4 text-center">
-            <button className="text-purple-400 hover:text-purple-300 text-sm font-medium">
-              View All Transactions
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Processing Overlay */}
-      {processing && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 text-center"
-          >
-            <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-xl font-bold text-white mb-2">⏳ Processing...</h3>
-            <p className="text-white/70">Please wait while we process your request</p>
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Buy Confirmation Modal */}
-      {showBuyConfirm && selectedPackage && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => setShowBuyConfirm(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-gradient-to-br from-blue-900/90 to-purple-900/90 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md mx-4"
-          >
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShoppingCart className="w-8 h-8 text-blue-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">💳 Confirm Purchase</h3>
-              <p className="text-white/70">You're about to purchase Happy Coins</p>
-            </div>
-            
-            <div className="bg-white/10 rounded-xl p-6 mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Package:</span>
-                <span className="text-white font-semibold">{selectedPackage.label}</span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Amount:</span>
-                <span className="text-white font-semibold">{selectedPackage.amount} HC</span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Price:</span>
-                <span className="text-green-400 font-bold text-xl">{selectedPackage.formattedPrice}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-white/70">Rate:</span>
-                <span className="text-white/80">{formatPrice(selectedPackage.convertedPrice / selectedPackage.amount, selectedCurrency)}/HC</span>
-              </div>
-            </div>
-            
-            <div className="flex gap-3">
-              <motion.button
-                onClick={() => setShowBuyConfirm(false)}
-                className="flex-1 py-3 px-4 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Cancel
-              </motion.button>
-              <motion.button
-                onClick={confirmBuyCoins}
-                className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                🚀 Confirm Purchase
-              </motion.button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Stake Confirmation Modal */}
-      {showStakeConfirm && selectedStake && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => setShowStakeConfirm(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-gradient-to-br from-purple-900/90 to-green-900/90 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md mx-4"
-          >
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <PiggyBank className="w-8 h-8 text-purple-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">🏦 Confirm Staking</h3>
-              <p className="text-white/70">You're about to stake Happy Coins</p>
-            </div>
-            
-            <div className="bg-white/10 rounded-xl p-6 mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Plan:</span>
-                <span className="text-white font-semibold">{selectedStake.label}</span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Amount:</span>
-                <span className="text-white font-semibold">{selectedStake.amount} HC</span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Duration:</span>
-                <span className="text-blue-400 font-semibold">{selectedStake.days} days</span>
-              </div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-white/70">APY:</span>
-                <span className="text-green-400 font-bold text-xl">{selectedStake.apy}%</span>
-              </div>
-              
-              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3">
-                <p className="text-yellow-200 text-sm">
-                  ⚠️ <strong>Important:</strong> Your {selectedStake.amount} HC will be locked for {selectedStake.days} days. Early withdrawal may incur penalties.
+                <p className={`font-bold ${transaction.type === 'spent' ? 'text-red-500' : 'text-green-500'}`}>
+                  {transaction.type === 'spent' ? '-' : '+'}{transaction.amount} HP
                 </p>
               </div>
-            </div>
-            
-            <div className="flex gap-3">
-              <motion.button
-                onClick={() => setShowStakeConfirm(false)}
-                className="flex-1 py-3 px-4 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Cancel
-              </motion.button>
-              <motion.button
-                onClick={confirmStake}
-                className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-green-600 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                🚀 Start Staking
-              </motion.button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
+            ))
+          ) : (
+            <p className="text-muted">No transactions yet.</p>
+          )}
+        </div>
+      </ActionCard>
+
 
     </motion.div>
   );
