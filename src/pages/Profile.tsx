@@ -65,6 +65,9 @@ export default function ProfilePage() {
 
   const [editForm, setEditForm] = useState<UserProfile>(profile)
   const [offers, setOffers] = useState<P2POffer[]>([]);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // Happy emoji avatars collection
   const emojiAvatars = [
@@ -83,13 +86,11 @@ export default function ProfilePage() {
     try {
       setLoading(true)
       
-      if (isAuthenticated && user) {
+      if (isAuthenticated && user && authProfile) {
         httpSupabaseAPI.getWalletTransactions(user.id).then(setTransactions);
         httpSupabaseAPI.getP2POffers().then(setOffers);
         httpSupabaseAPI.getBookings(user.id).then(setBookings);
-        httpSupabaseAPI.getP2POffers().then(setOffers);
-        httpSupabaseAPI.getBookings(user.id).then(setBookings);
-        // Use real Supabase profile data
+        
         // Use real Supabase profile data
         const userProfile: UserProfile = {
           id: authProfile.id,
