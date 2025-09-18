@@ -1,29 +1,31 @@
-import { useState, useEffect } from 'react'
-import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react';
+import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Gamepad2, 
-  Gift, 
+  Search, 
+  Bell, 
+  ChevronDown, 
   User, 
-  Wallet, 
+  LogOut, 
   Menu, 
   X, 
-  Bell,
-  Home,
-  ChevronDown,
-  Bot,
-  LogOut,
-  LogIn
-} from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+  Bot, 
+  Phone, 
+  Receipt, 
+  Plane, 
+  Utensils 
+} from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const navigation = [
-  { name: 'Games', href: '/dashboard', icon: Gamepad2 },
-  { name: 'Rewards', href: '/dashboard/rewards', icon: Gift },
-  { name: 'Wallet', href: '/dashboard/wallet', icon: Wallet },
-  { name: 'AI Assistant', href: '/dashboard/ai', icon: Bot },
-  { name: 'Profile', href: '/dashboard/profile', icon: User },
-]
+  { name: 'Recharge', href: '/dashboard/recharge', icon: Phone },
+  { name: 'Bill Payments', href: '/dashboard/payments', icon: Receipt },
+  { name: 'Travel', href: '/dashboard/travel', icon: Plane },
+];
+
+const lifestyleNav = [
+  { name: 'Food Delivery', href: '/dashboard/food', icon: Utensils },
+];
 
 export default function DashboardLayout() {
   const location = useLocation()
@@ -72,204 +74,100 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Mobile sidebar backdrop */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar - Fixed for desktop, animated for mobile */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-black/20 backdrop-blur-xl border-r border-white/10 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        {/* Logo */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <Link to="/dashboard" className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">HP</span>
+    <div className="min-h-screen flex bg-[#1a1a1a] text-white">
+      {/* Sidebar */}
+      <div className="w-64 bg-[#2c2c2c] p-6 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">💰</span>
             </div>
-            <span className="text-white font-semibold">Happy Paisa</span>
-          </Link>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white/60 hover:text-white"
-          >
-            <X className="w-6 h-6" />
-          </button>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg">Happy Paisa</span>
+              <span className="text-xs text-gray-400">Smart Assistant</span>
+            </div>
+          </div>
+          <nav>
+            <h3 className="text-xs text-gray-500 uppercase font-bold mb-4">Services</h3>
+            <ul className="space-y-2">
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <Link 
+                    to={item.href} 
+                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${location.pathname === item.href ? 'bg-blue-500' : 'hover:bg-gray-700'}`}>
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <h3 className="text-xs text-gray-500 uppercase font-bold my-4">Lifestyle</h3>
+            <ul className="space-y-2">
+              {lifestyleNav.map((item) => (
+                <li key={item.name}>
+                  <Link 
+                    to={item.href} 
+                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${location.pathname === item.href ? 'bg-blue-500' : 'hover:bg-gray-700'}`}>
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
-
-        {/* Navigation */}
-        <nav className="px-4 py-6 space-y-2">
-          {navigation.map((item) => {
-            const active = isActive(item.href)
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                  active
-                    ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-white border border-purple-500/30'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.name}</span>
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* Bottom section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <Link
-            to="/"
-            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-          >
-            <Home className="w-5 h-5" />
-            <span className="font-medium">Back to Home</span>
-          </Link>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+              <Bot size={24} />
+            </div>
+            <div>
+              <h4 className="font-bold">Mr. Happy</h4>
+              <p className="text-xs text-gray-400">Listening...</p>
+            </div>
+            <button className="ml-auto p-2 bg-blue-500 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93V15h3a1 1 0 110 2H6a1 1 0 110-2h3v-2.07A5.002 5.002 0 015 9V7a5 5 0 0110 0v2a5.002 5.002 0 01-2 4.93z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          <ul className="space-y-2">
+            <li><button className="w-full text-left p-3 bg-gray-700 rounded-lg">Check Balance</button></li>
+            <li><button className="w-full text-left p-3 bg-gray-700 rounded-lg">Mobile Recharge</button></li>
+            <li><button className="w-full text-left p-3 bg-gray-700 rounded-lg">Pay Bills</button></li>
+            <li><button className="w-full text-left p-3 bg-blue-500 rounded-lg">Chat with Mr. Happy</button></li>
+          </ul>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-black/20 backdrop-blur-xl border-b border-white/10">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-white/70 hover:text-white"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            
-            {/* Breadcrumb */}
-            <div className="hidden md:flex items-center space-x-2 text-sm">
-              <span className="text-white/60">Dashboard</span>
-              {location.pathname !== '/dashboard' && location.pathname !== '/dashboard/' && (
-                <>
-                  <span className="text-white/40">/</span>
-                  <span className="text-white capitalize">
-                    {location.pathname.split('/').pop()}
-                  </span>
-                </>
-              )}
-            </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-[#2c2c2c] p-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Travel Booking</h1>
+            <p className="text-gray-400">Manage your travel services</p>
           </div>
-
-          <div className="flex items-center space-x-4">
-            {/* Notifications */}
-            <button className="relative p-2 text-white/70 hover:text-white transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-
-            {/* User menu */}
+          <div className="flex items-center gap-6">
             <div className="relative">
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-              >
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
-                  {profile?.avatar_url ? (
-                    profile.avatar_url.startsWith('emoji:') ? (
-                      <div className="text-xl">
-                        {profile.avatar_url.replace('emoji:', '')}
-                      </div>
-                    ) : (
-                      <img 
-                        src={profile.avatar_url} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                      />
-                    )
-                  ) : (
-                    <User className="w-4 h-4 text-white" />
-                  )}
-                </div>
-                <div className="hidden md:block text-left">
-                  <div className="text-sm font-medium">{profile?.username || user?.email?.split('@')[0] || 'Loading...'}</div>
-                  <div className="text-xs text-white/60">
-                    {loading ? 'Loading...' : isAuthenticated ? 'Authenticated' : 'Guest'}
-                  </div>
-                </div>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-
-              {/* User menu dropdown */}
-              <AnimatePresence>
-                {userMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 mt-2 w-48 bg-black/80 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl"
-                  >
-                    <div className="py-2">
-                      <Link
-                        to="/dashboard/profile"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <User className="w-4 h-4" />
-                        <span>Profile</span>
-                      </Link>
-                      <Link
-                        to="/dashboard/wallet"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <Wallet className="w-4 h-4" />
-                        <span>Wallet</span>
-                      </Link>
-                      <hr className="my-2 border-white/10" />
-                      {isAuthenticated ? (
-                        <button
-                          onClick={handleSignOut}
-                          className="flex items-center space-x-3 px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors w-full text-left"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Sign Out</span>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleSignIn}
-                          className="flex items-center space-x-3 px-4 py-2 text-green-400 hover:text-green-300 hover:bg-green-500/10 transition-colors w-full text-left"
-                        >
-                          <LogIn className="w-4 h-4" />
-                          <span>Sign In</span>
-                        </button>
-                      )}
-                      <Link
-                        to="/"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <Home className="w-4 h-4" />
-                        <span>Back to Home</span>
-                      </Link>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <input type="text" placeholder="Search or ask Mr. Happy..." className="bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 w-72" />
+            </div>
+            <Bell size={24} />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-700 rounded-full"></div>
+              <div>
+                <p className="font-bold">John Doe</p>
+                <p className="text-sm text-gray-400">₹12,450.75</p>
+              </div>
+              <ChevronDown size={20} />
             </div>
           </div>
-        </div>
-
-        {/* Page content */}
-        <main className="min-h-screen">
+        </header>
+        <main className="flex-1 p-6">
           <Outlet />
         </main>
       </div>
     </div>
-  )
+  );
 }

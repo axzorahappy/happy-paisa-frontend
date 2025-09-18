@@ -4,14 +4,13 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --bg: #f8f9fa;
-  --panel: #ffffff;
-  --text: #212529;
-  --muted: #6c757d;
+  color-scheme: dark;
+  --bg: #1a1a1a;
+  --panel: #2c2c2c;
+  --text: #ffffff;
+  --muted: #a0a0a0;
   --brand: #007bff;
-  --brand-light: #e6f2ff;
-  --border: #dee2e6;
+  --border: #404040;
 }
 
 body {
@@ -24,9 +23,9 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .card {
