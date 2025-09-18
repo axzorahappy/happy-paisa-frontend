@@ -46,6 +46,43 @@ export function getSupabase() {
     console.error('❌ getSupabase: Missing environment variables!')
   }
   
+  // Make available globally for Happy Paisa integration
+  if (typeof window !== 'undefined' && client) {
+    window.HAPPY_PAISA_SUPABASE = client;
+    console.log('✅ Happy Paisa Supabase client available globally');
+  }
+  
   return client
+}
+
+// Happy Paisa Types
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  phone: string;
+  main_balance: number;
+  happy_coins: number;
+  cashback_balance: number;
+  referral_code: string;
+  created_at: string;
+}
+
+export interface GameScore {
+  id: string;
+  user_id: string;
+  game_type: string;
+  score: number;
+  coins_earned: number;
+  duration: number;
+  created_at: string;
+}
+
+// Global type extension for Happy Paisa
+declare global {
+  interface Window {
+    HAPPY_PAISA_SUPABASE: any;
+    netlifyIdentity: any;
+  }
 }
 

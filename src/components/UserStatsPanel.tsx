@@ -49,6 +49,7 @@ interface GamePerformanceData {
   bestScore: number;
   totalEarnings: number;
   winRate: number;
+  [key: string]: string | number;
 }
 
 export default function UserStatsPanel({ userId, isOpen, onClose }: UserStatsPanelProps) {
@@ -65,6 +66,7 @@ export default function UserStatsPanel({ userId, isOpen, onClose }: UserStatsPan
       // Transform user stats into chart-friendly format
       const gameData = Object.entries(userStats.gameStats).map(([gameType, stats]) => ({
         gameType,
+        name: gameType,
         gamesPlayed: stats.gamesPlayed,
         averageScore: stats.averageScore,
         bestScore: stats.bestScore,
