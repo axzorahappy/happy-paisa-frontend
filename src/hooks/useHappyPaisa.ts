@@ -96,16 +96,15 @@ export const useHappyPaisa = () => {
 
       if (!existingProfile) {
         // Create new user profile
-        const newProfile = {
+        const newProfile: UserProfile = {
           id: user.id,
           email: user.email,
-          full_name: user.user_metadata?.full_name || user.email.split('@')[0],
+          full_name: (user.user_metadata?.full_name || user.email.split('@')[0]) as string,
           phone: user.user_metadata?.phone || '',
           main_balance: isNewUser ? 1000.00 : 0,
           happy_coins: isNewUser ? 100 : 0,
           cashback_balance: 0,
-          referral_code: generateReferralCode(),
-          created_at: new Date().toISOString()
+          referral_code: generateReferralCode()
         };
 
         await supabase.from('user_profiles').insert([newProfile]);
@@ -267,18 +266,6 @@ export const useHappyPaisa = () => {
   };
 };
 
-// Extend window type for TypeScript
-declare global {
-  interface Window {
-    netlifyIdentity: {
-      init: () => void;
-      currentUser: () => User | null;
-      on: (event: string, callback: (user?: User) => void) => void;
-      open: (mode: 'login' | 'signup') => void;
-      logout: () => void;
-    };
-    HAPPY_PAISA_SUPABASE: any;
-  }
-}
+// Note: Window types are declared in src/lib/supabase.ts
 
 export default useHappyPaisa;
